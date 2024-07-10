@@ -1,9 +1,8 @@
 name: Generate HTML and Deploy
 
 on:
-  push:
-    branches:
-      - master
+  schedule:
+    - cron: '27 12 * * *'
 
 jobs:
   build-and-deploy:
