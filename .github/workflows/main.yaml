@@ -1,0 +1,28 @@
+name: Generate HTML and Deploy
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.x'
+    - name: Install dependencies
+      run: |
+        pip install requests
+    - name: Run script
+      run: python main_threads.py
+    - name: Commit and push if changed
+      run: |
+        git config --global user.email "chabdullah@hotmail.it"
+        git config --global user.name "chabdullahAction"
+        git add -A
+        git commit -m "Update HTML" || echo "No changes to commit"
+        git push
