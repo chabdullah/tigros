@@ -24,4 +24,4 @@ jobs:
         git config --global user.name "chabdullahAction"
         git add -A
         git commit -m "Update HTML" || echo "No changes to commit"
-        git push
+        git push https://${{ secrets.MY_GITHUB_PAT }}@github.com/chabdullah/tigros.git HEAD:main
