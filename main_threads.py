@@ -1,6 +1,15 @@
 import requests
 import concurrent.futures
 
+ignoredProducts = []
+with open("ignoreProducts.txt", "r") as file:
+    for line in file:
+        ignoredProducts.append(line.strip())
+
+def isItemIgnored(productUrl):
+    return productUrl in ignoredProducts
+
+
 def findProductsOnPage(pageNr, base, minimumDiscount):
     print(f"Checking page {pageNr}")
     url = f"{base}/ebsn/api/products?page={pageNr}"
@@ -10,9 +19,11 @@ def findProductsOnPage(pageNr, base, minimumDiscount):
     for product in response["data"]["products"]:
         if "warehousePromo" in product:
             itemUrl = product["itemUrl"]
+            if isItemIgnored(base+itemUrl):
+                continue
             name = product["name"]
             imageUrl = product["mediaURLMedium"]
-            pageContent += f"<tr><td>{name}</td><td><img src='{imageUrl}'></td><td><a href='{base + itemUrl}'>{base + itemUrl}</a></td></tr>"
+            pageContent += f"<tr><td>{name}</td><td><img src='{imageUrl}'></td><td><a href='{base + itemUrl}'>{base + itemUrl}</a></td><td><button onclick='deleteRow(this, \"{base + itemUrl}\")'>X</button></td></tr>"
 
     return pageContent
 
@@ -32,7 +43,17 @@ def findProductsPerPage():
         img { height: 150px; }
     </style>
     """
-    responsePage = f"<html><head>{style}</head><body><h1>Products</h1><table><tr><th>Item</th><th>Image</th><th>URL</th></tr>"
+    script = """
+    <script>
+        function deleteRow(button, itemUrl) {
+            // Navigate up to the parent row and remove it
+            var row = button.parentNode.parentNode;
+            row.parentNode.removeChild(row);
+            console.log(itemUrl);
+        }
+    </script>
+    """
+    responsePage = f"<html><head>{style}{script}</head><body><h1>Products</h1><table><tr><th>Item</th><th>Image</th><th>URL</th><th>Action</th></tr>"
 
     with concurrent.futures.ThreadPoolExecutor(max_workers=20) as executor:
         futures = [executor.submit(findProductsOnPage, pageNr + i, base, minimumDiscount) for i in range(nPages)]
