@@ -2,7 +2,7 @@ name: Generate HTML and Deploy
 
 on:
   schedule:
-    - cron: '0 0 * * *'
+     - cron: '*/10 * * * *'
 
 jobs:
   build-and-deploy:
@@ -21,7 +21,7 @@ jobs:
     - name: Commit and push if changed
       run: |
         git config --global user.email "chabdullah@hotmail.it"
-        git config --global user.name "chabdullahAction"
+        git config --global user.name "chabdullah"
         git add -A
         git commit -m "Update HTML" || echo "No changes to commit"
         git push https://${{ secrets.MY_GITHUB_PAT }}@github.com/chabdullah/tigros.git HEAD:main
