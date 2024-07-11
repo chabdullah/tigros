@@ -51,9 +51,30 @@ def findProductsPerPage():
             row.parentNode.removeChild(row);
             console.log(itemUrl);
         }
+        function filterProducts() {
+            var input, filter, table, tr, td, i, txtValue;
+            input = document.getElementById("searchBar");
+            filter = input.value.toUpperCase();
+            table = document.getElementById("productsTable");
+            tr = table.getElementsByTagName("tr");
+
+            for (i = 0; i < tr.length; i++) {
+                td = tr[i].getElementsByTagName("td")[2]; // Column index for product name
+                if (td) {
+                    txtValue = td.textContent || td.innerText;
+                    if (txtValue.toUpperCase().indexOf(filter) > -1) {
+                        tr[i].style.display = "";
+                    } else {
+                        tr[i].style.display = "none";
+                    }
+                }       
+            }
+        }
     </script>
     """
-    responsePage = f"<html><head>{style}{script}</head><body><h1>Products</h1><table><tr><th>Item</th><th>Image</th><th>URL</th><th>Action</th></tr>"
+    responsePage = f"<html><head>{style}{script}</head><body><h1>Products</h1>"
+    responsePage += 'Cerca <input type="text" id="searchBar" onkeyup="filterProducts()" placeholder="Nome prodotto...">'
+    responsePage += "<table id='productsTable'><tr><th>Item</th><th>Image</th><th>URL</th><th>Action</th></tr>"
 
     with concurrent.futures.ThreadPoolExecutor(max_workers=20) as executor:
         futures = [executor.submit(findProductsOnPage, pageNr + i, base, minimumDiscount) for i in range(nPages)]
