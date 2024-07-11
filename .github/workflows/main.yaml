@@ -1,14 +1,18 @@
-name: Generate HTML and Deploy
+name: Cronjob Generate HTML and Deploy
 
 on:
   schedule:
-     - cron: '*/10 * * * *'
+     - cron: '*/5 * * * *'
 
 jobs:
   build-and-deploy:
+    permissions:
+      contents: write
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
+      with:
+        token: ${{ secrets.MY_GITHUB_PAT }}
     - name: Set up Python
       uses: actions/setup-python@v2
       with:
