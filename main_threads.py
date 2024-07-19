@@ -45,7 +45,7 @@ def findProductsPerPage():
         th { background-color: #f2f2f2; border-top: 1px solid #ddd; }
         tr:nth-child(even) {background-color: #f9f9f9;}
         tr:nth-child(odd) {background-color: #ffffff;}
-        img { height: 150px; }
+        img { height: 180px; }
     </style>
     """
     script = """
