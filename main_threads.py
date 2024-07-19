@@ -21,9 +21,14 @@ def findProductsOnPage(pageNr, base, minimumDiscount):
             itemUrl = product["itemUrl"]
             if isItemIgnored(base+itemUrl):
                 continue
-            name = product["name"]
+            name = product["name"].lower()
+            discountPerc = str(product["warehousePromo"].get("discountPerc", "N/A"))
+            if discountPerc == "N/A":
+                discountPerc = product["warehousePromo"]["view"].get("header", "N/A")
+            if "%" not in discountPerc:
+                discountPerc += "%"
             imageUrl = product["mediaURLMedium"]
-            pageContent += f"<tr><td>{name}</td><td><img src='{imageUrl}'></td><td><a href='{base + itemUrl}'>{base + itemUrl}</a></td><td><button onclick='deleteRow(this, \"{base + itemUrl}\")'>X</button></td></tr>"
+            pageContent += f"<tr><td>{name}</td><td><img src='{imageUrl}'></td><td><a href='{base + itemUrl}'>Clica qui</a></td><td>{discountPerc}<td/></tr>"
 
     return pageContent
 
@@ -45,12 +50,6 @@ def findProductsPerPage():
     """
     script = """
     <script>
-        function deleteRow(button, itemUrl) {
-            // Navigate up to the parent row and remove it
-            var row = button.parentNode.parentNode;
-            row.parentNode.removeChild(row);
-            console.log(itemUrl);
-        }
         function filterProducts() {
             var input, filter, table, tr, td, i, txtValue;
             input = document.getElementById("searchBar");
@@ -74,7 +73,7 @@ def findProductsPerPage():
     """
     responsePage = f"<html><head>{style}{script}</head><body><h1>Products</h1>"
     responsePage += 'Cerca <input type="text" id="searchBar" onkeyup="filterProducts()" placeholder="Nome prodotto...">'
-    responsePage += "<table id='productsTable'><tr><th>Item</th><th>Image</th><th>URL</th><th>Action</th></tr>"
+    responsePage += "<table id='productsTable'><tr><th>Item</th><th>Image</th><th>URL</th><th>Sconto</th></tr>"
 
     with concurrent.futures.ThreadPoolExecutor(max_workers=20) as executor:
         futures = [executor.submit(findProductsOnPage, pageNr + i, base, minimumDiscount) for i in range(nPages)]
